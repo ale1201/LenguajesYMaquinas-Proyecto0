@@ -78,7 +78,7 @@ public class Interpreter   {
 				String[] vars = input.split("VARS");
 				String[] names = vars[1].split(",");
 				for (int i = 0; i < names.length; i++) {
-					
+
 					if(i == names.length-1){
 						String[] begin = names[i].split("BEGIN");
 						hash.put(begin[0], -1);
@@ -88,97 +88,106 @@ public class Interpreter   {
 					}
 				}
 				//System.err.println(hash.keySet());
-				
-				String[] begin= input.split("BEGIN");
-				String[] instructions = begin[1].split(";");
-				for (int i = 0; i < instructions.length; i++)
+			}
+			if(input.contains("BEGIN"))
+			{
+			String[] begin= input.split("BEGIN");
+			String[] instructions = begin[1].split(";");
+			for (int i = 0; i < instructions.length; i++)
+			{
+				if(instructions[i].startsWith("assign") )
 				{
-					if(instructions[i].startsWith("assign") )
+					String asignar = instructions[i].substring(7);
+					String[] aux = asignar.split("to:");
+					//System.out.println(aux[1]);
+					hash.replace(aux[1], Integer.valueOf(aux[0]));
+					//System.out.println(hash.get(aux[1]));
+
+				}
+				else if (instructions[i].startsWith("move"))
+				{
+					if(instructions[i].contains("toThe"))
 					{
-						String asignar = instructions[i].substring(7);
-						String[] aux = asignar.split("to:");
-						//System.out.println(aux[1]);
-						hash.replace(aux[1], Integer.valueOf(aux[0]));
-						//System.out.println(hash.get(aux[1]));
 
 					}
-					else if (instructions[i].startsWith("move"))
+					else if(instructions[i].contains("inDir"))
 					{
-						if(instructions[i].contains("toThe"))
-						{
 
-						}
-						else if(instructions[i].contains("inDir"))
+					}
+					else
+					{
+						String num = instructions[i].substring(5);
+						Integer valor = hash.get(num);
+						if(valor == null)
 						{
-
-						}
-						else
-						{
-							String num = instructions[i].substring(5);
 							world.moveForward(Integer.valueOf(num));
 						}
-					}
-					else if(instructions[i].startsWith("turn") )
-					{
-						String girar = instructions[i].substring(5);
-						if(girar == "left")
-						{
-							world.turnRight();
-							world.turnRight();
-							world.turnRight();
-						}
-						else if (girar == "around")
-						{
-							world.turnRight();
-							world.turnRight();
-						}
-						else
-							world.turnRight();
-					}
-					else if(instructions[i].startsWith("face") )
-					{
-						String orientacion = instructions[i].substring(5);
-						int or = world.getOrientacion();
-						if (orientacion == "north")
-						{
-							while (or!=0) {
-								world.turnRight();
-								or = world.getOrientacion();
-							}
-						}
-						if (orientacion == "south")
-						{
-							while(or!=1){
-								world.turnRight();
-								or = world.getOrientacion();
-							}
-						}
-						if (orientacion == "east")
-						{
-							while(or!=2){
-								world.turnRight();
-								or = world.getOrientacion();
-							}
-						}
-						if (orientacion == "west")
-						{
-							while(or!=3){
-								world.turnRight();
-								or = world.getOrientacion();
-							}
-						}
-					}
-					else if(instructions[i].startsWith("put") )
-					{
-
-					}
-					else if(instructions[i].startsWith("pick") )
-					{
-
+						else 
+							world.moveForward(valor);
+						
 					}
 				}
+				else if(instructions[i].startsWith("turn") )
+				{
+					String girar = instructions[i].substring(5);
+					if(girar.equals("left"))
+					{
+						world.turnRight();
+						world.turnRight();
+						world.turnRight();
+					}
+					else if (girar.equals("around"))
+					{
+						world.turnRight();
+						world.turnRight();
+					}
+					else
+						world.turnRight();
+				}
+				else if(instructions[i].startsWith("face") )
+				{
+					String orientacion = instructions[i].substring(5);
+					int or = world.getOrientacion();
+					if (orientacion.equals("north"))
+					{
+						while (or!=0) {
+							world.turnRight();
+							or = world.getOrientacion();
+						}
+					}
+					if (orientacion.equals("south"))
+					{
+						while(or!=1){
+							world.turnRight();
+							or = world.getOrientacion();
+						}
+					}
+					if (orientacion.equals("east"))
+					{
+						while(or!=2){
+							world.turnRight();
+							or = world.getOrientacion();
+						}
+					}
+					if (orientacion.equals("west"))
+					{
+						while(or!=3){
+							world.turnRight();
+							or = world.getOrientacion();
+						}
+					}
+				}
+				else if(instructions[i].startsWith("put") )
+				{
 
+				}
+				else if(instructions[i].startsWith("pick") )
+				{
+
+				}
 			}
+			}
+
 		}
 		else{
 
