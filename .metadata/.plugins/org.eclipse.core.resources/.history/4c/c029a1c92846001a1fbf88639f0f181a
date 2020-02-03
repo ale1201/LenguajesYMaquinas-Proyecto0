@@ -68,14 +68,11 @@ public class Interpreter   {
 
 	public String process(String input) throws Error
 	{   
+
 		StringBuffer output=new StringBuffer("SYSTEM RESPONSE: -->\n");	
 		input = input.replace(" ", "");
 		if(input.startsWith("ROBOT_R"))
 		{
-			if(input.endsWith("END")){
-				input = input.substring(0, input.length()-3);
-			}
-			else throw new Error();
 			if(input.contains("VARS"))
 			{
 				String[] vars = input.split("VARS");
