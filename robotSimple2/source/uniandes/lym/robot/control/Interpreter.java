@@ -84,10 +84,10 @@ public class Interpreter   {
 
 					if(i == names.length-1){
 						String[] begin = names[i].split("BEGIN");
-						hash.put(begin[0], -1);
+						hash.put(begin[0], 0);
 					}
 					else{
-						hash.put(names[i], -1);
+						hash.put(names[i], 0);
 					}
 				}
 				//System.err.println(hash.keySet());
