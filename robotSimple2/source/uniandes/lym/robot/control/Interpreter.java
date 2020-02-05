@@ -75,7 +75,7 @@ public class Interpreter   {
 			if(input.endsWith("END")){
 				input = input.substring(0, input.length()-3);
 			}
-			else throw new Error();
+//			else throw new Error();
 			if(input.contains("VARS"))
 			{
 				String[] vars = input.split("VARS");
@@ -206,7 +206,26 @@ public class Interpreter   {
 				}
 				else if(instructions[i].startsWith("pick") )
 				{
-
+					String num = instructions[i].substring(5);
+					String[] BoC = num.split("of:");
+					Integer valor = hash.get(BoC[0]);
+					if(valor == null)
+					{
+						if(BoC[1].equals("Balloons"))
+						{
+							world.grabBalloons(Integer.valueOf(BoC[0]));
+						}
+						else
+							world.pickChips(Integer.valueOf(BoC[0]));
+					}
+					else {
+						if(BoC[1].equals("Balloons"))
+						{
+							world.grabBalloons(valor);
+						}
+						else
+							world.pickChips(valor);
+					}
 				}
 				else if(instructions[i].startsWith("skip") || instructions[i].startsWith("Skip") )
 				{
