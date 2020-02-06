@@ -1,11 +1,9 @@
 package uniandes.lym.robot.control;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-import javax.swing.SwingUtilities;
-
-import uniandes.lym.robot.kernel.*;
+import uniandes.lym.robot.kernel.RobotWorld;
+import uniandes.lym.robot.kernel.RobotWorldDec;
 
 
 
@@ -55,6 +53,51 @@ public class Interpreter   {
 
 	}
 
+	public void checkDirectionAndMove(String direction, Integer steps) {
+
+		if(direction.contains("right")) {
+			world.moveHorizontally(steps);
+		}
+		else if(direction.contains("left")) {
+			world.moveHorizontally(-steps);
+		}
+		else if(direction.contains("front")) {
+			world.moveForward(steps);
+		}
+		else if(direction.contains("back")) {
+			world.moveForward(-steps);
+		}
+
+	}
+
+
+
+
+	public void checkFacingAndMove(String face, Integer steps) {
+
+		int facing = world.getOrientacion(); 
+
+		if(face.contains("north")) {
+			world.changeFacing(world.NORTH);
+			world.moveForward(steps);
+		}
+		else if(face.contains("south")) {
+			world.changeFacing(world.SOUTH);
+			world.moveForward(steps);
+		}
+		else if(face.contains("east")) {
+			world.changeFacing(world.EAST);
+			world.moveForward(steps);
+		}
+		else if(face.contains("west")) {
+			world.changeFacing(world.WEST);
+			world.moveForward(steps);
+		}
+
+
+
+	}
+
 
 
 	/**
@@ -75,7 +118,7 @@ public class Interpreter   {
 			if(input.endsWith("END")){
 				input = input.substring(0, input.length()-3);
 			}
-//			else throw new Error();
+			//			else throw new Error();
 			if(input.contains("VARS"))
 			{
 				String[] vars = input.split("VARS");
@@ -94,156 +137,168 @@ public class Interpreter   {
 			}
 			if(input.contains("BEGIN"))
 			{
-			String[] begin= input.split("BEGIN");
-			String[] instructions = begin[1].split(";");
-			for (int i = 0; i < instructions.length; i++)
-			{
-				if(instructions[i].startsWith("assign") )
+				String[] begin= input.split("BEGIN");
+				String[] instructions = begin[1].split(";");
+				for (int i = 0; i < instructions.length; i++)
 				{
-					String asignar = instructions[i].substring(7);
-					String[] aux = asignar.split("to:");
-					//System.out.println(aux[1]);
-					hash.replace(aux[1], Integer.valueOf(aux[0]));
-					//System.out.println(hash.get(aux[1]));
-
-				}
-				else if (instructions[i].startsWith("move"))
-				{
-					if(instructions[i].contains("toThe"))
+					if(instructions[i].startsWith("assign") )
 					{
-						String instr = instructions[i].substring(5); 
-						String[] aux = instr.split("toThe:"); 
-						Integer n = hash.get(aux[0]); 
-						Integer value = Integer.getInteger(aux[0]); 
-						
-						if(n == null){
-							world.moveVertically(value);
-						}
-						else {
-							world.moveVertically(n);
-						}
-						
-						
-					}
-					else if(instructions[i].contains("inDir"))
-					{
+						String asignar = instructions[i].substring(7);
+						String[] aux = asignar.split("to:");
+						//System.out.println(aux[1]);
+						hash.replace(aux[1], Integer.valueOf(aux[0]));
+						//System.out.println(hash.get(aux[1]));
 
 					}
-					else
+					else if (instructions[i].startsWith("move"))
 					{
-						String num = instructions[i].substring(5);
-						Integer valor = hash.get(num);
+						if(instructions[i].contains("toThe"))
+						{
+							String instr = instructions[i].substring(5); 
+							String[] aux = instr.split("toThe:"); 
+							Integer n = hash.get(aux[0]); 
+							String direction = aux[1];	
+							Integer value = n == null ? Integer.valueOf(aux[0]) : null;   
+
+							if(n == null){
+								checkDirectionAndMove(direction, value);
+							}
+							else {
+								checkDirectionAndMove(direction, n);
+							}
+
+
+						}
+						else if(instructions[i].contains("inDir"))
+						{
+							String instr = instructions[i].substring(5); 
+							String[] aux = instr.split("inDir:"); 
+							Integer n = hash.get(aux[0]); 
+							String face = aux[1]; 
+							Integer value = n == null ? Integer.valueOf(aux[0]) : null; 
+
+							if(n == null) {
+								checkFacingAndMove(face, value);
+							}
+							else {
+								checkFacingAndMove(face, n);
+							}
+						}
+						else
+						{
+							String num = instructions[i].substring(5);
+							Integer valor = hash.get(num);
+							if(valor == null)
+							{
+								world.moveForward(Integer.valueOf(num));
+							}
+							else 
+								world.moveForward(valor);
+
+						}
+					}
+					else if(instructions[i].startsWith("turn") )
+					{
+						String girar = instructions[i].substring(5);
+						if(girar.equals("left"))
+						{
+							world.turnRight();
+							world.turnRight();
+							world.turnRight();
+						}
+						else if (girar.equals("around"))
+						{
+							world.turnRight();
+							world.turnRight();
+						}
+						else
+							world.turnRight();
+					}
+					else if(instructions[i].startsWith("face") )
+					{
+						String orientacion = instructions[i].substring(5);
+						int or = world.getOrientacion();
+						if (orientacion.equals("north"))
+						{
+							while (or!=0) {
+								world.turnRight();
+								or = world.getOrientacion();
+							}
+						}
+						if (orientacion.equals("south"))
+						{
+							while(or!=1){
+								world.turnRight();
+								or = world.getOrientacion();
+							}
+						}
+						if (orientacion.equals("east"))
+						{
+							while(or!=2){
+								world.turnRight();
+								or = world.getOrientacion();
+							}
+						}
+						if (orientacion.equals("west"))
+						{
+							while(or!=3){
+								world.turnRight();
+								or = world.getOrientacion();
+							}
+						}
+					}
+					else if(instructions[i].startsWith("put") )
+					{
+						String num = instructions[i].substring(4);
+						String[] BoC = num.split("of:");
+						Integer valor = hash.get(BoC[0]);
 						if(valor == null)
 						{
-							world.moveForward(Integer.valueOf(num));
+							if(BoC[1].equals("Balloons"))
+							{
+								world.putBalloons(Integer.valueOf(BoC[0]));
+							}
+							else
+								world.putChips(Integer.valueOf(BoC[0]));
 						}
-						else 
-							world.moveForward(valor);
-						
-					}
-				}
-				else if(instructions[i].startsWith("turn") )
-				{
-					String girar = instructions[i].substring(5);
-					if(girar.equals("left"))
-					{
-						world.turnRight();
-						world.turnRight();
-						world.turnRight();
-					}
-					else if (girar.equals("around"))
-					{
-						world.turnRight();
-						world.turnRight();
-					}
-					else
-						world.turnRight();
-				}
-				else if(instructions[i].startsWith("face") )
-				{
-					String orientacion = instructions[i].substring(5);
-					int or = world.getOrientacion();
-					if (orientacion.equals("north"))
-					{
-						while (or!=0) {
-							world.turnRight();
-							or = world.getOrientacion();
+						else {
+							if(BoC[1].equals("Balloons"))
+							{
+								world.putBalloons(valor);
+							}
+							else
+								world.putChips(valor);
 						}
+
 					}
-					if (orientacion.equals("south"))
+					else if(instructions[i].startsWith("pick") )
 					{
-						while(or!=1){
-							world.turnRight();
-							or = world.getOrientacion();
-						}
-					}
-					if (orientacion.equals("east"))
-					{
-						while(or!=2){
-							world.turnRight();
-							or = world.getOrientacion();
-						}
-					}
-					if (orientacion.equals("west"))
-					{
-						while(or!=3){
-							world.turnRight();
-							or = world.getOrientacion();
-						}
-					}
-				}
-				else if(instructions[i].startsWith("put") )
-				{
-					String num = instructions[i].substring(4);
-					String[] BoC = num.split("of:");
-					Integer valor = hash.get(BoC[0]);
-					if(valor == null)
-					{
-						if(BoC[1].equals("Balloons"))
+						String num = instructions[i].substring(5);
+						String[] BoC = num.split("of:");
+						Integer valor = hash.get(BoC[0]);
+						if(valor == null)
 						{
-							world.putBalloons(Integer.valueOf(BoC[0]));
+							if(BoC[1].equals("Balloons"))
+							{
+								world.grabBalloons(Integer.valueOf(BoC[0]));
+							}
+							else
+								world.pickChips(Integer.valueOf(BoC[0]));
 						}
-						else
-							world.putChips(Integer.valueOf(BoC[0]));
-					}
-					else {
-						if(BoC[1].equals("Balloons"))
-						{
-							world.putBalloons(valor);
+						else {
+							if(BoC[1].equals("Balloons"))
+							{
+								world.grabBalloons(valor);
+							}
+							else
+								world.pickChips(valor);
 						}
-						else
-							world.putChips(valor);
 					}
-						
-				}
-				else if(instructions[i].startsWith("pick") )
-				{
-					String num = instructions[i].substring(5);
-					String[] BoC = num.split("of:");
-					Integer valor = hash.get(BoC[0]);
-					if(valor == null)
+					else if(instructions[i].startsWith("skip") || instructions[i].startsWith("Skip") )
 					{
-						if(BoC[1].equals("Balloons"))
-						{
-							world.grabBalloons(Integer.valueOf(BoC[0]));
-						}
-						else
-							world.pickChips(Integer.valueOf(BoC[0]));
-					}
-					else {
-						if(BoC[1].equals("Balloons"))
-						{
-							world.grabBalloons(valor);
-						}
-						else
-							world.pickChips(valor);
+
 					}
 				}
-				else if(instructions[i].startsWith("skip") || instructions[i].startsWith("Skip") )
-				{
-					
-				}
-			}
 			}
 
 		}

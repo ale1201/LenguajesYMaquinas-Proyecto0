@@ -3,9 +3,9 @@ package uniandes.lym.robot.kernel;
 
 
 import java.awt.Point;
-import java.util.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.HashSet;
 
 
 
@@ -28,60 +28,60 @@ public class RobotWorld //extends Observable
 {
 
 	//   Attributes and methods for  simulating deprecated Observable Interface
-	
+
 	PropertyChangeSupport pcs = new  PropertyChangeSupport(this);
-	
+
 	public void addObserver(PropertyChangeListener l) {
 		pcs.addPropertyChangeListener("theProperty", l);
 	}
-	
-	
-	
-	
-/** Constants to model the direction that the robot is facing
- * 	
- */
+
+
+
+
+	/** Constants to model the direction that the robot is facing
+	 * 	
+	 */
 	public static final int NORTH = 0;
 	public static final int SOUTH = 1;
 	public static final int EAST = 2;
 	public static final int WEST = 3;
-	
+
 	/**
 	 * The dimension of the board. Being a square, only one value suffices.
-	*/
+	 */
 	private int n;
-	
+
 	/**  Cell where the robot is located */
 	private Point posicion;
-	
+
 	/**
 	 * Set of positions that contain chips
 	 */
-	
+
 	private HashSet <Point> fichas;
-	
+
 	/**  Number of balloons held by the Robot*/
-	
+
 	private int misGlobos;
 	/** Number of Chips held by the Robot*/
-	
+
 	private int misFichas;
-	
-	
-	
+
+
+
 	/**   Last change performed on the world */
-	
+
 	private Change cambio;
-	
+
 	/**  int table used to store the number of balloons in each cell */
-	
-	
+
+
 	private int globos[][];
-	
+
 	/**  Orientation that the robot is facing */
-	
+
 	private int orientacion;
-	
+
 	/**
 	 * RobotWorld constructor
 	 * @param dim  World dimension
@@ -89,29 +89,29 @@ public class RobotWorld //extends Observable
 	 * @param initB initial number of balloons
 	 * @param initC initial number of chips
 	 */
-	
+
 	public RobotWorld(int dim, Point pos, int initB, int initC) {
-		
-		
+
+
 		this.n = dim;
 		this.posicion = pos;
 		this.misFichas = initC;
 		this.misGlobos = initB;
-		
+
 		// Initially there are no chips nor balloons 
-		
+
 		this.fichas = new HashSet <Point>();
 		this.globos = new int[dim][dim];
 
 		// No change
 		this.cambio = new Change();
-		
+
 		//Initially facing north
-		
+
 		this.orientacion = NORTH;
 	}
 
-	
+
 	/** 
 	 * Default constructor:  size 8, at position (1,1) with 630 balloons and 64 chips 
 	 */
@@ -132,10 +132,10 @@ public class RobotWorld //extends Observable
 	 * @param clean:  if false then then the current balloons and chips are left on the board
 	 *                 if true the cells are left without chips and without balloons.
 	 */
-	
+
 	public void reinicializar(Point pos, int newB, int newC, boolean clean) {
 		int i,j;
-		
+
 		posicion = pos;
 		misGlobos = newB;
 		misFichas = newC;
@@ -154,8 +154,8 @@ public class RobotWorld //extends Observable
 		//this.setChanged();
 		//this.notifyObservers(this.cambio);
 		pcs.firePropertyChange("theProperty", n, cambio);
-}
-	
+	}
+
 	/**
 	 * Move the robot left
 	 * If the robot is at the far left, the behavior is not defined
@@ -207,12 +207,12 @@ public class RobotWorld //extends Observable
 		buscarErrores();
 		informar();
 	}
-	
+
 	/**
 	 *  Puts a balloon in its current position, incrementing the number of balloons in that position.
 	 *  If the robot has no balloons, the behavior is nor defined
 	 */
-	
+
 	public void ponerGlobo() {
 		int x = (int)this.posicion.getX();
 		int y = (int)this.posicion.getY();	
@@ -245,7 +245,7 @@ public class RobotWorld //extends Observable
 		//De acuerdo al API de java.util.HashSet la funcion add devuelve un valor de verdad
 		//que es cierto si se esta incertando por primera vez, falso en caso contrario
 		//Si no se esta insertando por primera vez eso indica que ya habia ficha en la posicion en la que 
-	
+
 		int y = (int)this.posicion.getY();
 		int b;
 		boolean yaPuesta=false;
@@ -263,8 +263,8 @@ public class RobotWorld //extends Observable
 				//Sale del ciclo
 				break;
 			}
-		//buscarErrores();
-		//informar();
+			//buscarErrores();
+			//informar();
 		}
 		if(!yaPuesta) {
 			this.posicion = new Point(1,1);
@@ -272,8 +272,8 @@ public class RobotWorld //extends Observable
 			informar();
 		}
 		else {
-		  misFichas--;
-		  informar();	
+			misFichas--;
+			informar();	
 		}
 	}
 	/**
@@ -281,7 +281,7 @@ public class RobotWorld //extends Observable
 	 * If there is a chip, then the robot keeps it and all chips above it fall one position
 	 * If there is no chip, the behavior is undefined.
 	 */
-		
+
 	public void recogerFicha() {
 		int y = (int)this.posicion.getY();
 		int x = (int)this.posicion.getX();
@@ -291,55 +291,55 @@ public class RobotWorld //extends Observable
 		//actual = 	new Point(this.posicion);
 		anterior = 	new Point(this.posicion);
 		siguiente = new Point(this.posicion);
-			
+
 		if(!this.hayFicha(this.posicion)) {
 			comportamientoDeError("No chip to put");
 			informar();
 		}
 		else {
-	    // hay dos casos: 
-		//    1. Hay fichas encima
-		//    2. No hay fichas encima
-		misFichas++;
+			// hay dos casos: 
+			//    1. Hay fichas encima
+			//    2. No hay fichas encima
+			misFichas++;
 
-		  if (y != 0) {
-			siguiente.setLocation(siguiente.getX(),y-1);
-			if (!this.hayFicha(siguiente)){
-			
+			if (y != 0) {
+				siguiente.setLocation(siguiente.getX(),y-1);
+				if (!this.hayFicha(siguiente)){
+
+					this.cambio.setStart(this.posicion);
+					this.fichas.remove(this.posicion);
+
+					informar();
+				}
+				else {
+					if (y-2 < 0) {
+						anterior.setLocation(siguiente.getX(),siguiente.getY());
+					}
+					else {                    
+						for(b=y-2;b >= 0 && this.hayFicha(siguiente);b--){
+							anterior.setLocation(siguiente.getX(),siguiente.getY());
+							siguiente.setLocation(siguiente.getX(),b);
+						}
+					}
+					this.cambio.setStart(anterior);
+					this.fichas.remove(anterior);
+					informar();
+					this.posicion.setLocation(x,y);  
+					informar();
+				}		
+			}
+			else {
 				this.cambio.setStart(this.posicion);
 				this.fichas.remove(this.posicion);
-				
 				informar();
-			}
-            else {
-              if (y-2 < 0) {
-				  anterior.setLocation(siguiente.getX(),siguiente.getY());
-			  }
-			  else {                    
-				for(b=y-2;b >= 0 && this.hayFicha(siguiente);b--){
-					anterior.setLocation(siguiente.getX(),siguiente.getY());
-					siguiente.setLocation(siguiente.getX(),b);
-			   	}
-              }
-			  this.cambio.setStart(anterior);
-			  this.fichas.remove(anterior);
-			  informar();
-              this.posicion.setLocation(x,y);  
-			  informar();
-			}		
-		  }
-          else {
-			this.cambio.setStart(this.posicion);
-			this.fichas.remove(this.posicion);
-			informar();
 			}
 		}
 	}
-	
+
 	//
 	// Metodos privados
 	//
-	
+
 	/**
 	 * Used to determine if there was an error:
 	 *  Robot's position outside the board
@@ -348,17 +348,17 @@ public class RobotWorld //extends Observable
 	 *  Errors due to placing chips are taken care of it the nethod putChips
 	 *  If there is an error, errorBehavior is invoked 
 	 *  */
-	
+
 	private void buscarErrores() {
 		int x,y;
 		//Hay que hacer casting porque getX y getY devuelven variables de tipo double
 		x = (int)this.posicion.getX();
 		y = (int)this.posicion.getY();		
 		if(x < 1 || x > this.n) {
-				comportamientoDeError("Illegal column: "+ x);
+			comportamientoDeError("Illegal column: "+ x);
 		}
 		else if ( y<1 || y>this.n )  {
-				comportamientoDeError("Illegal row: "+ y);
+			comportamientoDeError("Illegal row: "+ y);
 		}
 		else if (this.misFichas < 0) {
 			comportamientoDeError("Not enough chips o put:" + (-this.misFichas));
@@ -372,20 +372,20 @@ public class RobotWorld //extends Observable
 	}
 
 	/**
-	* Error Behavior: world without chips, balloons, and robot
-	*/
+	 * Error Behavior: world without chips, balloons, and robot
+	 */
 	private void comportamientoDeError(String message) throws Error  {
-		
+
 		this.posicion = new Point(1,1);			
 		this.misFichas = 0;
 		this.misGlobos = 0;
-		
+
 		cambio.setEnd(new Point(n+1,n+1));
 		cambio.setStart(new Point(0,0));
-		
+
 		//this.setChanged();
 		//this.notifyObservers(this.cambio);
-		
+
 		pcs.firePropertyChange("theProperty", n, cambio);
 		throw new Error(message);
 	}
@@ -398,16 +398,16 @@ public class RobotWorld //extends Observable
 
 	protected void informar() {
 		this.cambio.setEnd(this.posicion);
-		
+
 		//Metodos heredados de observer
 		//this.setChanged();
 		//this.notifyObservers(this.cambio);
-		
+
 		pcs.firePropertyChange("theProperty", n, cambio);
-	
+
 	}
-	
-	
+
+
 	//
 	// Metodos analizadores
 	//
@@ -424,16 +424,16 @@ public class RobotWorld //extends Observable
 		return this.n;
 	}
 	/**
-	* @return nuimber of balloons held by the robot
-    */
+	 * @return nuimber of balloons held by the robot
+	 */
 	public int getMisGlobos() {
 		return this.misGlobos;
 	}
 	/**
-	* @return nuimber of chips held by the robot
-    */
+	 * @return nuimber of chips held by the robot
+	 */
 	public int getMisFichas() {
-			return this.misFichas;
+		return this.misFichas;
 	}
 
 	/**
@@ -459,7 +459,7 @@ public class RobotWorld //extends Observable
 	public int contarGlobos(Point p) {
 		return this.globos[p.x-1][p.y-1];
 	}
-	
+
 	/**
 	 * Devuelve el numero de globos que hay en la posicion actual.
 	 * @return El n&uacute;mero de globos que hay en la posicion actual.
@@ -467,7 +467,7 @@ public class RobotWorld //extends Observable
 	public int contarGlobos() {
 		return this.globos[(this.posicion).x-1][(this.posicion).y-1];
 	}
-	
+
 	/**
 	 * Devuelve true si exite por lo menos un globo en la posicion actual.
 	 * @return true si existe por lo menos un globo en la posicion actuel
@@ -518,20 +518,20 @@ public class RobotWorld //extends Observable
 	 * @param clean:  if false then then the current balloons and chips are left on the board
 	 *                 if true the cells are left without chips and without balloons.
 	 */
-	
+
 	public void reinicializar(int dim, Point pos, int newB, int newC, boolean clean) {
 
 		int i,j;
 		int tempGlobos[][] = new int[dim][dim];
 		int  minDim = (n<dim)?n: dim; 
 		Point tempFichas[] = (Point [])fichas.toArray();
-		
+
 		n = dim;
 		posicion = pos;
 		misGlobos = newB;
 		misFichas = newC;
-		
-		
+
+
 		if (clean) {
 			fichas.clear();		
 			globos = tempGlobos;
@@ -553,42 +553,42 @@ public class RobotWorld //extends Observable
 				}
 			}
 		}
-		
-//		El cambio es "nada"
+
+		//		El cambio es "nada"
 		this.cambio = new Change();
 		cambio.setEnd(new Point(n+1,n+1));
 		cambio.setStart(new Point(n+1,n+1));
 		//this.setChanged();
-				//this.notifyObservers(this.cambio);
-				pcs.firePropertyChange("theProperty", n, cambio);
-}
+		//this.notifyObservers(this.cambio);
+		pcs.firePropertyChange("theProperty", n, cambio);
+	}
 
-	
-	
+
+
 	/** 
 	 * Modifies the wolrd's size without changing anything else. the 
 	 * size is decreased and the robots ennds up outside the new dimensions, it is placed at the end of the world
 	 * @param dim new size
 	 */
-	
+
 	public void reinicializar(int dim) {
 
 		int i,j;
 		int tempGlobos[][] = new int[dim][dim];
 		int  minDim = Math.min(dim,n); 
 		Point tempFichas[] = (Point [])fichas.toArray();
-				
-		
-		
-	     posicion.x = Math.min(dim,posicion.x);
-		 posicion.y =  Math.min(dim,posicion.y);
-				
+
+
+
+		posicion.x = Math.min(dim,posicion.x);
+		posicion.y =  Math.min(dim,posicion.y);
+
 		for(i=0; i<minDim; i++) {
 			for (j=0; j<minDim; j++) {
 				tempGlobos[i][j]=globos[i][j];
 			}
 		}	
-		
+
 		if (dim < n) {		
 			for (i=0; i < tempFichas.length; i++) {
 				Point pf1 = tempFichas[i];
@@ -597,17 +597,17 @@ public class RobotWorld //extends Observable
 				}
 			}
 		}
-		
+
 		globos = tempGlobos;			
 		n = dim;
-		
+
 		this.cambio = new Change();
 		cambio.setEnd(new Point(n+1,n+1));
-		
-				pcs.firePropertyChange("theProperty", n, cambio);
-		
+
+		pcs.firePropertyChange("theProperty", n, cambio);
+
 	}	
-	
+
 	/**
 	 * verifies whether or not  robotis facing north
 	 * @return true if robot is facing north; false otherwise
@@ -636,7 +636,7 @@ public class RobotWorld //extends Observable
 	public boolean facingWest() {
 		return this.orientacion==WEST;
 	}
-	
+
 	/**
 	 * 
 	 * @return The robot's oreintation SOUTH, EAST OR WEST).
@@ -644,7 +644,7 @@ public class RobotWorld //extends Observable
 	public int getOrientacion(){
 		return this.orientacion;
 	}
-	
+
 	/**
 	 * Turns the robot 90 degrees to the right. 
 	 */
@@ -660,7 +660,11 @@ public class RobotWorld //extends Observable
 		}
 		informar();
 	}
-	
-	
-	
+
+	public void changeFacing(Integer num) {
+		this.orientacion = num; 
+	}
+
+
+
 }
