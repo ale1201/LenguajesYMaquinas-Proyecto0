@@ -111,7 +111,19 @@ public class Interpreter   {
 				{
 					if(instructions[i].contains("toThe"))
 					{
-
+						String instr = instructions[i].substring(5); 
+						String[] aux = instr.split("toThe:"); 
+						Integer n = hash.get(aux[0]); 
+						Integer value = Integer.getInteger(aux[0]); 
+						
+						if(n == null){
+							world.moveVertically(value);
+						}
+						else {
+							world.moveVertically(n);
+						}
+						
+						
 					}
 					else if(instructions[i].contains("inDir"))
 					{
